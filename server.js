@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
+const exphbs = require('express-handlebars');
 
 // Scraping tools
 const axios = require('axios');
@@ -9,7 +10,6 @@ const cheerio = require('cheerio');
 
 // DB info
 const databaseURL = 'h18_scraper';
-const collections = ['scraped_data'];
 
 // Require all models
 const db = require('./models');
@@ -24,6 +24,9 @@ app.use(logger("dev"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static("public"));
 
+app.engine('handlebars', exphbs({defaultLayout: 'main'}));
+app.set('view engine', 'handlebars');
+
 // Connect to mongoDB
 mongoose.Promise = Promise;
 mongoose.connect("mongodb://localhost/hw18_scraper", {
@@ -31,8 +34,18 @@ mongoose.connect("mongodb://localhost/hw18_scraper", {
 });
 
 // Routes
+app.get('/', function(req, res, next) {
+  db.Article.find({}).then(function(data) {
+    res.render('article', {articles: data});
+  });
+});
 app.get('/scrape', function(req, res, next) {
   axios.get("https://news.google.com/news/?ned=us&gl=US&hl=en").then(function(response) {
+  console.log("\n************************\n" +
+              "Grabbing every title and link\n" +
+              "from Google News:" +
+              "\n************************\n");
+              
     const $ = cheerio.load(response.data);
 
     $("div c-wiz").each(function(i, element) {
@@ -54,7 +67,7 @@ app.get('/scrape', function(req, res, next) {
       });
     });
 
-    res.send("Scrape Complete");
+    res.send("Scrape Complete" + "<br><a href='/'>Home</a>");
   });
 });
 
