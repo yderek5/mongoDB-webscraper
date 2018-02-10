@@ -34,6 +34,7 @@ mongoose.connect("mongodb://localhost/hw18_scraper", {
 });
 
 // Routes
+// Home page
 app.get('/', function(req, res, next) {
   db.Article.find({}).then(function(data) {
     res.render('article', {articles: data});
@@ -57,6 +58,7 @@ app.get('/scrape', function(req, res, next) {
       result.link = $(this)
       .children('a')
       .attr("href");
+      result.saved = false;
 
       db.Article.create(result)
       .then(function(dbArticle) {
@@ -70,7 +72,16 @@ app.get('/scrape', function(req, res, next) {
     res.send("Scrape Complete" + "<br><a href='/'>Home</a>");
   });
 });
+// Saved page routes
+app.route('/saved')
+  .get(function(req, res, next) {
+    res.render('saved');
+  })
+  .post(function(req, res, next) {
+    
+  });
 
+// Articles API
 app.get('/articles', function(req, res, next) {
   db.Article.find({})
   .then(function(dbArticle) {
@@ -81,6 +92,7 @@ app.get('/articles', function(req, res, next) {
   });
 });
 
+// Specific Article API
 app.get('/articles/:id', function(req, res, next) {
   db.Article.findOne({_id: req.params.id})
   .populate("note")
@@ -92,6 +104,7 @@ app.get('/articles/:id', function(req, res, next) {
   });
 });
 
+// Making a note route
 app.post('/articles/:id', function(req, res, next) {
   db.Note.create(req.body)
   .then(function(dbNote) {
