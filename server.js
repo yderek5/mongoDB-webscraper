@@ -11,7 +11,8 @@ const cheerio = require('cheerio');
 // Require all models
 const db = require('./models');
 
-const PORT = '3000';
+var port = process.env.PORT || '3000';
+
 
 // Setup Express App
 const app = express();
@@ -119,6 +120,6 @@ app.post('/articles/:id', function(req, res, next) {
 });
 
 // Port Listener
-app.listen(PORT, function() {
-    console.log(`App running on ${PORT}!`);
+app.listen(port, function() {
+    console.log(`App running on ${port}!`);
 });
