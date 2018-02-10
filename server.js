@@ -8,9 +8,6 @@ const exphbs = require('express-handlebars');
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-// DB info
-const databaseURL = 'h18_scraper';
-
 // Require all models
 const db = require('./models');
 
@@ -27,9 +24,12 @@ app.use(express.static("public"));
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
 
-// Connect to mongoDB
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/hw18_scraper";
+
+// Set mongoose to leverage built in JavaScript ES6 Promises
+// Connect to the Mongo DB
 mongoose.Promise = Promise;
-mongoose.connect("mongodb://localhost/hw18_scraper", {
+mongoose.connect(MONGODB_URI, {
   useMongoClient: true
 });
 
